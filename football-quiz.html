@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحدي المونديال ⚽ مسابقة كروية</title>
+<meta name="description" content="تحدي المونديال — مسابقة أسئلة كروية بين طرفين: من يملك الذاكرة الأقوى في عالم كرة القدم؟">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pitch-900:#0d3b26;   /* أخضر ملعب داكن */
+  --pitch-700:#14532d;
+  --pitch-500:#1f7a45;
+  --gold:#d4a017;
+  --gold-soft:#f0c948;
+  --sand:#f8f1df;        /* خلفية دافئة */
+  --sand-deep:#efe3c6;
+  --card:#fffdf7;
+  --ink:#22301f;
+  --ink-soft:#5c6b57;
+  --red:#c0392b;
+  --radius:18px;
+  --shadow:0 10px 30px rgba(13,59,38,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Tajawal',system-ui,sans-serif;
+  background:
+    radial-gradient(1100px 500px at 85% -10%, rgba(212,160,23,.14), transparent 60%),
+    radial-gradient(900px 500px at 0% 110%, rgba(31,122,69,.12), transparent 60%),
+    var(--sand);
+  color:var(--ink);
+  min-height:100vh;
+  line-height:1.7;
+}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 56px}
+
+/* ===== الهيدر ===== */
+header.hero{
+  position:relative;
+  background:linear-gradient(160deg,var(--pitch-900) 0%,var(--pitch-700) 70%,#1a6238 100%);
+  color:#fdf8ea;
+  border-radius:0 0 28px 28px;
+  padding:44px 20px 58px;
+  text-align:center;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+/* خطوط الملعب: دائرة المنتصف وخط المنتصف */
+header.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background:
+    radial-gradient(circle at 50% 120%, transparent 118px, #fff 119px, #fff 121px, transparent 122px),
+    linear-gradient(#fff,#fff) center bottom/2px 34px no-repeat;
+}
+/* أشرطة عشب باهتة */
+header.hero::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+  background:repeating-linear-gradient(90deg,#fff 0 60px,transparent 60px 120px);
+}
+.hero .cup{font-size:56px;display:block;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation:bob 3.2s ease-in-out infinite}
+.hero h1{
+  font-size:clamp(34px,6vw,52px);font-weight:900;letter-spacing:.5px;margin:8px 0 6px;
+  color:var(--gold-soft);text-shadow:0 3px 0 rgba(0,0,0,.25);
+}
+.hero p.sub{font-size:clamp(15px,2.6vw,19px);font-weight:500;color:#eef5e9;max-width:560px;margin:0 auto}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ===== لوحة النتيجة ===== */
+.scoreboard{
+  display:none;
+  margin:-30px auto 26px;max-width:640px;position:relative;z-index:2;
+  background:linear-gradient(180deg,#0f4630,var(--pitch-900));
+  border:2px solid var(--gold);
+  border-radius:16px;box-shadow:var(--shadow);
+  color:#fdf8ea;
+  padding:12px 14px;
+  display:none;
+  grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+}
+.scoreboard.visible{display:grid}
+.sb-side{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:12px;transition:background .3s, box-shadow .3s}
+.sb-side .name{font-weight:800;font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-side .pts{font-size:34px;font-weight:900;color:var(--gold-soft);line-height:1;font-variant-numeric:tabular-nums}
+.sb-side.leading{background:rgba(212,160,23,.16);box-shadow:inset 0 0 0 2px var(--gold)}
+.sb-side.leading .name::after{content:" 👑"}
+.sb-vs{font-weight:900;color:var(--gold);font-size:18px;opacity:.9}
+
+/* ===== البطاقات العامة ===== */
+.card{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  border:1px solid var(--sand-deep);
+  padding:28px 24px;margin:0 auto 24px;max-width:640px;
+}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .45s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+h2.card-title{font-size:22px;font-weight:800;color:var(--pitch-700);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+
+/* ===== نموذج الإعداد ===== */
+label{display:block;font-weight:700;margin:14px 0 6px;color:var(--ink)}
+input[type=text],select{
+  width:100%;padding:12px 14px;font-family:inherit;font-size:16px;
+  border:2px solid var(--sand-deep);border-radius:12px;background:#fff;color:var(--ink);
+  transition:border-color .2s, box-shadow .2s;
+}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--pitch-500);box-shadow:0 0 0 3px rgba(31,122,69,.18)}
+
+.btn{
+  font-family:inherit;font-size:17px;font-weight:800;cursor:pointer;
+  border:none;border-radius:14px;padding:13px 22px;
+  transition:transform .15s, box-shadow .15s, filter .15s;
+  display:inline-flex;align-items:center;gap:8px;justify-content:center;
+}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn-primary{background:linear-gradient(135deg,var(--pitch-500),var(--pitch-700));color:#fff;box-shadow:0 6px 16px rgba(20,83,45,.35);width:100%;margin-top:22px;font-size:19px}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-gold{background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#3a2c05;box-shadow:0 6px 16px rgba(212,160,23,.4)}
+.btn-correct{background:#e8f6ec;color:#166534;border:2px solid #16a34a}
+.btn-wrong{background:#fdeceb;color:#991b1b;border:2px solid var(--red)}
+.btn-ghost{background:#fff;color:var(--pitch-700);border:2px solid var(--pitch-500)}
+.btn-wa{background:#25d366;color:#fff}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.btn-row .btn{flex:1;min-width:140px}
+
+.last-result{
+  margin-top:18px;padding:12px 14px;border-radius:12px;background:var(--sand);
+  border:1px dashed var(--gold);font-size:14px;color:var(--ink-soft);display:none;
+}
+.last-result.visible{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.last-result button{background:none;border:none;color:var(--red);font-family:inherit;font-weight:700;cursor:pointer;font-size:13px}
+
+/* ===== شاشة المسابقة ===== */
+.turn-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  margin-bottom:16px;
+}
+.turn-chip{
+  background:linear-gradient(135deg,var(--pitch-500),var(--pitch-700));color:#fff;
+  padding:8px 16px;border-radius:999px;font-weight:800;font-size:15px;
+  box-shadow:0 4px 10px rgba(20,83,45,.3);
+}
+.q-counter{font-weight:700;color:var(--ink-soft);font-size:14px}
+.q-meta{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:700;padding:3px 12px;border-radius:999px}
+.tag.cat{background:rgba(31,122,69,.12);color:var(--pitch-700)}
+.tag.diff{background:rgba(212,160,23,.18);color:#8a6a0c}
+.question-text{
+  font-size:clamp(20px,3.5vw,26px);font-weight:800;color:var(--ink);
+  padding:18px 4px 6px;min-height:70px;
+  animation:qPop .4s ease both;
+}
+@keyframes qPop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.answer-box{
+  margin-top:14px;background:var(--sand);border:2px solid var(--gold);border-radius:12px;
+  padding:14px 16px;font-size:19px;font-weight:800;color:var(--pitch-700);
+  display:none;animation:qPop .3s ease both;
+}
+.answer-box.visible{display:block}
+.answer-box .lbl{display:block;font-size:12px;font-weight:700;color:#8a6a0c;margin-bottom:2px}
+.judge-hint{font-size:13px;color:var(--ink-soft);margin-top:16px;text-align:center}
+.progress{height:8px;background:var(--sand-deep);border-radius:99px;overflow:hidden;margin-top:20px}
+.progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--pitch-500),var(--gold));transition:width .4s ease;border-radius:99px}
+
+/* السؤال الذهبي */
+.golden .card{border:3px solid var(--gold);background:linear-gradient(180deg,#fffdf4,#fbf3da)}
+.golden-badge{
+  display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--gold-soft),var(--gold));
+  color:#3a2c05;font-weight:900;padding:6px 18px;border-radius:999px;margin-bottom:12px;font-size:15px;
+  animation:shine 1.6s ease-in-out infinite;
+}
+@keyframes shine{0%,100%{box-shadow:0 0 0 0 rgba(212,160,23,.5)}50%{box-shadow:0 0 0 10px rgba(212,160,23,0)}}
+
+/* ===== شاشة النهاية ===== */
+.final{text-align:center}
+.final .trophy{font-size:72px;display:block;animation:bob 2.6s ease-in-out infinite}
+.final h2{font-size:clamp(26px,5vw,36px);font-weight:900;color:var(--pitch-700);margin:10px 0 4px}
+.final .winner-name{color:var(--gold);text-shadow:0 2px 0 rgba(0,0,0,.08)}
+.final .score-line{font-size:22px;font-weight:800;margin:10px 0;color:var(--ink)}
+.final .hype{font-size:16px;color:var(--ink-soft);max-width:420px;margin:0 auto 8px}
+
+/* كونفيتي */
+.confetti{position:fixed;top:-14px;pointer-events:none;z-index:99;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.8}}
+
+footer{max-width:640px;margin:24px auto 0;text-align:center;font-size:13px;color:var(--ink-soft)}
+
+@media (max-width:560px){
+  .card{padding:22px 16px}
+  .sb-side .pts{font-size:26px}
+  .hero .cup{font-size:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="cup" aria-hidden="true">🏆</span>
+  <h1>تحدي المونديال</h1>
+  <p class="sub">مسابقة كروية بين لاعب ولاعب أو فريق وفريق — من يملك الذاكرة الأقوى؟ ⚽</p>
+</header>
+
+<div class="wrap">
+
+  <!-- لوحة النتيجة -->
+  <div class="scoreboard" id="scoreboard" aria-live="polite">
+    <div class="sb-side" id="sbA"><span class="name" id="sbNameA">الطرف الأول</span><span class="pts" id="sbPtsA">0</span></div>
+    <div class="sb-vs">VS</div>
+    <div class="sb-side" id="sbB"><span class="name" id="sbNameB">الطرف الثاني</span><span class="pts" id="sbPtsB">0</span></div>
+  </div>
+
+  <!-- 1) شاشة الإعداد -->
+  <section class="screen active" id="setupScreen">
+    <div class="card">
+      <h2 class="card-title">⚽ إعداد المسابقة</h2>
+      <label for="nameA">اسم الطرف الأول</label>
+      <input type="text" id="nameA" placeholder="مثال: صقور الخليج" maxlength="24">
+      <label for="nameB">اسم الطرف الثاني</label>
+      <input type="text" id="nameB" placeholder="مثال: نسور الشمال" maxlength="24">
+      <label for="matchType">نوع المسابقة</label>
+      <select id="matchType">
+        <option value="لاعب ضد لاعب">لاعب ضد لاعب</option>
+        <option value="فريق ضد فريق">فريق ضد فريق</option>
+        <option value="مجموعة ضد مجموعة">مجموعة ضد مجموعة</option>
+      </select>
+      <button class="btn btn-primary" id="startBtn">🥅 ابدأ التحدي</button>
+      <div class="last-result" id="lastResult">
+        <span id="lastResultText"></span>
+        <button id="clearLastBtn" type="button">مسح</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2) شاشة المسابقة -->
+  <section class="screen" id="quizScreen">
+    <div class="card">
+      <div class="turn-banner">
+        <span class="turn-chip" id="turnChip">🎯 الدور على: —</span>
+        <span class="q-counter" id="qCounter">سؤال 1 من 20</span>
+      </div>
+      <div class="q-meta">
+        <span class="tag cat" id="qCat">كأس العالم</span>
+        <span class="tag diff" id="qDiff">سهل</span>
+      </div>
+      <p class="question-text" id="qText">…</p>
+      <div class="answer-box" id="answerBox"><span class="lbl">الإجابة الصحيحة</span><span id="answerText"></span></div>
+
+      <div class="btn-row" id="revealRow">
+        <button class="btn btn-ghost" id="revealBtn">👁️ إظهار الإجابة</button>
+      </div>
+      <div class="btn-row" id="judgeRow" style="display:none">
+        <button class="btn btn-correct" id="correctBtn">✅ إجابة صحيحة</button>
+        <button class="btn btn-wrong" id="wrongBtn">❌ إجابة خاطئة</button>
+      </div>
+      <div class="btn-row" id="nextRow" style="display:none">
+        <button class="btn btn-gold" id="nextBtn">⏭️ السؤال التالي</button>
+      </div>
+      <p class="judge-hint">اقرأ السؤال على الطرف الذي عليه الدور، ثم أظهر الإجابة واحسم النقطة.</p>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+  </section>
+
+  <!-- السؤال الذهبي -->
+  <section class="screen golden" id="goldenScreen">
+    <div class="card" style="text-align:center">
+      <span class="golden-badge">🌟 السؤال الذهبي 🌟</span>
+      <p class="question-text" id="gText">…</p>
+      <div class="answer-box" id="gAnswerBox"><span class="lbl">الإجابة الصحيحة</span><span id="gAnswerText"></span></div>
+      <div class="btn-row" id="gRevealRow">
+        <button class="btn btn-ghost" id="gRevealBtn">👁️ إظهار الإجابة</button>
+      </div>
+      <div class="btn-row" id="gJudgeRow" style="display:none">
+        <button class="btn btn-correct" id="gWinABtn">🏅 أجاب أولًا</button>
+        <button class="btn btn-correct" id="gWinBBtn">🏅 أجاب أولًا</button>
+        <button class="btn btn-ghost" id="gNoneBtn">🔁 لا أحد — سؤال ذهبي جديد</button>
+      </div>
+      <p class="judge-hint">أول من يجيب إجابة صحيحة يحسم اللقب!</p>
+    </div>
+  </section>
+
+  <!-- 3) شاشة النهاية -->
+  <section class="screen" id="endScreen">
+    <div class="card final">
+      <span class="trophy" id="endEmoji">🏆</span>
+      <h2 id="endTitle">الفائز: <span class="winner-name" id="winnerName"></span></h2>
+      <p class="score-line" id="finalScore"></p>
+      <p class="hype" id="hypeMsg"></p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="replayBtn" style="margin-top:0">🔄 إعادة المسابقة</button>
+        <button class="btn btn-wa" id="waBtn">📲 مشاركة عبر WhatsApp</button>
+      </div>
+      <div class="btn-row" id="goldenCallRow" style="display:none">
+        <button class="btn btn-gold" id="goldenBtn">🌟 السؤال الذهبي</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>تحدي المونديال ⚽ صفحة مستقلة جاهزة للنشر على GitHub Pages — بلا أي مكتبات خارجية.</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ================= بنك الأسئلة (44 سؤالًا) ================= */
+const QUESTIONS = [
+  {question:"من فاز بكأس العالم 2022؟", answer:"الأرجنتين", category:"كأس العالم", difficulty:"سهل"},
+  {question:"من فاز بكأس العالم 2018؟", answer:"فرنسا", category:"كأس العالم", difficulty:"سهل"},
+  {question:"من أكثر منتخب فوزًا بكأس العالم؟", answer:"البرازيل (5 مرات)", category:"المنتخبات", difficulty:"سهل"},
+  {question:"أين أقيم كأس العالم 2010؟", answer:"جنوب أفريقيا", category:"كأس العالم", difficulty:"سهل"},
+  {question:"من سجل هدف إسبانيا في نهائي كأس العالم 2010؟", answer:"أندريس إنييستا", category:"نهائيات كأس العالم", difficulty:"متوسط"},
+  {question:"من الهداف التاريخي لكأس العالم؟", answer:"ميروسلاف كلوزه (16 هدفًا)", category:"الأرقام القياسية", difficulty:"متوسط"},
+  {question:"من فاز بكأس العالم 2006؟", answer:"إيطاليا", category:"كأس العالم", difficulty:"سهل"},
+  {question:"من خسر نهائي كأس العالم 2022 أمام الأرجنتين؟", answer:"فرنسا", category:"نهائيات كأس العالم", difficulty:"سهل"},
+  {question:"من المنتخب الملقب بالسيليساو؟", answer:"البرازيل", category:"المنتخبات", difficulty:"سهل"},
+  {question:"من قاد الأرجنتين للفوز بكأس العالم 1986؟", answer:"دييغو مارادونا", category:"لحظات تاريخية", difficulty:"سهل"},
+  {question:"أين أقيمت أول نسخة من كأس العالم عام 1930؟", answer:"الأوروغواي", category:"كأس العالم", difficulty:"متوسط"},
+  {question:"من فاز بأول نسخة من كأس العالم عام 1930؟", answer:"الأوروغواي", category:"كأس العالم", difficulty:"متوسط"},
+  {question:"من فاز بكأس العالم 2014 في البرازيل؟", answer:"ألمانيا", category:"كأس العالم", difficulty:"سهل"},
+  {question:"في أي نسخة فازت ألمانيا على البرازيل 7-1 في نصف النهائي؟", answer:"كأس العالم 2014", category:"لحظات تاريخية", difficulty:"سهل"},
+  {question:"ما أول كأس عالم أقيم في قارة آسيا؟", answer:"نسخة 2002 في كوريا الجنوبية واليابان", category:"كأس العالم", difficulty:"متوسط"},
+  {question:"من فاز بكأس العالم 2002؟", answer:"البرازيل", category:"كأس العالم", difficulty:"سهل"},
+  {question:"من سجل هاتريك في نهائي كأس العالم 2022؟", answer:"كيليان مبابي", category:"نهائيات كأس العالم", difficulty:"سهل"},
+  {question:"من اللاعب الوحيد الذي فاز بكأس العالم 3 مرات؟", answer:"بيليه", category:"الأرقام القياسية", difficulty:"متوسط"},
+  {question:"من فاز بكأس العالم 1998 على أرضه؟", answer:"فرنسا", category:"كأس العالم", difficulty:"سهل"},
+  {question:"في أي نهائي طُرد زين الدين زيدان بعد نطحة شهيرة؟", answer:"نهائي كأس العالم 2006 ضد إيطاليا", category:"لحظات تاريخية", difficulty:"سهل"},
+  {question:"من أول منتخب أفريقي وعربي يبلغ نصف نهائي كأس العالم؟", answer:"المغرب (2022)", category:"لحظات تاريخية", difficulty:"سهل"},
+  {question:"ما الدول المستضيفة لكأس العالم 2026؟", answer:"الولايات المتحدة وكندا والمكسيك", category:"كأس العالم", difficulty:"سهل"},
+  {question:"ما أول دولة عربية تستضيف كأس العالم؟", answer:"قطر (2022)", category:"كأس العالم", difficulty:"سهل"},
+  {question:"من فاز بجائزة أفضل لاعب (الكرة الذهبية) في مونديال 2022؟", answer:"ليونيل ميسي", category:"اللاعبين", difficulty:"سهل"},
+  {question:"من كان هداف كأس العالم 2022؟", answer:"كيليان مبابي (8 أهداف)", category:"الأرقام القياسية", difficulty:"متوسط"},
+  {question:"من صاحب أسرع هدف في تاريخ كأس العالم (بعد 11 ثانية تقريبًا)؟", answer:"هاكان شوكور (2002)", category:"الأرقام القياسية", difficulty:"صعب"},
+  {question:"ضد من سجل مارادونا هدف \"يد الله\" الشهير عام 1986؟", answer:"إنجلترا", category:"لحظات تاريخية", difficulty:"متوسط"},
+  {question:"من اللاعب صاحب أكبر عدد مباريات في تاريخ كأس العالم؟", answer:"ليونيل ميسي (26 مباراة)", category:"الأرقام القياسية", difficulty:"صعب"},
+  {question:"أي منتخب عربي فاز على الأرجنتين في دور المجموعات بمونديال 2022؟", answer:"السعودية", category:"لحظات تاريخية", difficulty:"سهل"},
+  {question:"من فاز بكأس العالم 1990؟", answer:"ألمانيا الغربية", category:"كأس العالم", difficulty:"متوسط"},
+  {question:"من أضاع ركلة الترجيح الحاسمة لإيطاليا في نهائي كأس العالم 1994؟", answer:"روبرتو باجيو", category:"نهائيات كأس العالم", difficulty:"صعب"},
+  {question:"أين أقيم كأس العالم 1994؟", answer:"الولايات المتحدة", category:"كأس العالم", difficulty:"متوسط"},
+  {question:"من كان هداف كأس العالم 2002 برصيد 8 أهداف؟", answer:"رونالدو البرازيلي", category:"اللاعبين", difficulty:"متوسط"},
+  {question:"من فاز بالحذاء الذهبي (هداف البطولة) في مونديال 2018؟", answer:"هاري كين", category:"الأرقام القياسية", difficulty:"صعب"},
+  {question:"من اللاعب صاحب أكبر عدد من جوائز الكرة الذهبية (البالون دور)؟", answer:"ليونيل ميسي (8 جوائز)", category:"اللاعبين", difficulty:"سهل"},
+  {question:"ما منتخب كريستيانو رونالدو؟", answer:"البرتغال", category:"اللاعبين", difficulty:"سهل"},
+  {question:"ما النادي صاحب أكبر عدد من ألقاب دوري أبطال أوروبا؟", answer:"ريال مدريد (15 لقبًا)", category:"الأندية", difficulty:"سهل"},
+  {question:"ما النادي الذي يلعب على ملعب \"كامب نو\"؟", answer:"برشلونة", category:"الأندية", difficulty:"سهل"},
+  {question:"ما النادي الذي يلعب على ملعب \"أولد ترافورد\"؟", answer:"مانشستر يونايتد", category:"الأندية", difficulty:"سهل"},
+  {question:"ما جنسية اللاعب محمد صلاح الملقب بالفرعون؟", answer:"مصر", category:"اللاعبين", difficulty:"سهل"},
+  {question:"من اللاعب الأفريقي الوحيد الفائز بالكرة الذهبية؟", answer:"جورج ويا (1995)", category:"اللاعبين", difficulty:"صعب"},
+  {question:"ما المنتخب صاحب أكبر عدد من ألقاب كأس أمم أفريقيا؟", answer:"مصر (7 ألقاب)", category:"المنتخبات", difficulty:"متوسط"},
+  {question:"ما النادي الأفريقي صاحب أكبر عدد من ألقاب دوري أبطال أفريقيا؟", answer:"الأهلي المصري", category:"الأندية", difficulty:"متوسط"},
+  {question:"مع أي نادٍ إيطالي ارتبط اسم مارادونا وحقق معه الدوري مرتين؟", answer:"نابولي", category:"الأندية", difficulty:"متوسط"},
+  {question:"من الحارس الوحيد في التاريخ الفائز بالكرة الذهبية؟", answer:"ليف ياشين (1963)", category:"اللاعبين", difficulty:"صعب"},
+  {question:"إلى أي نادٍ سعودي انتقل كريستيانو رونالدو عام 2023؟", answer:"النصر", category:"الأندية", difficulty:"سهل"}
+];
+
+const QUESTIONS_PER_SIDE = 10;
+const TOTAL_QUESTIONS = QUESTIONS_PER_SIDE * 2;
+const STORAGE_KEY = "mondialChallengeLastResult";
+
+/* ================= حالة اللعبة ================= */
+const state = {
+  names: ["الطرف الأول", "الطرف الثاني"],
+  matchType: "",
+  deck: [],        // 20 سؤالًا للمسابقة
+  goldenPool: [],  // أسئلة احتياطية للسؤال الذهبي
+  index: 0,
+  scores: [0, 0],
+  finished: false
+};
+
+/* ================= أدوات ================= */
+const $ = id => document.getElementById(id);
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function currentSide(){ return state.index % 2; } // 0 = الطرف الأول
+
+/* ================= لوحة النتيجة ================= */
+function updateScoreboard(){
+  $("sbNameA").textContent = state.names[0];
+  $("sbNameB").textContent = state.names[1];
+  $("sbPtsA").textContent = state.scores[0];
+  $("sbPtsB").textContent = state.scores[1];
+  $("sbA").classList.toggle("leading", state.scores[0] > state.scores[1]);
+  $("sbB").classList.toggle("leading", state.scores[1] > state.scores[0]);
+}
+
+/* ================= بدء المسابقة ================= */
+$("startBtn").addEventListener("click", () => {
+  const a = $("nameA").value.trim() || "الطرف الأول";
+  const b = $("nameB").value.trim() || "الطرف الثاني";
+  state.names = [a, b];
+  state.matchType = $("matchType").value;
+  const shuffled = shuffle(QUESTIONS);
+  state.deck = shuffled.slice(0, TOTAL_QUESTIONS);
+  state.goldenPool = shuffled.slice(TOTAL_QUESTIONS);
+  state.index = 0;
+  state.scores = [0, 0];
+  state.finished = false;
+  updateScoreboard();
+  $("scoreboard").classList.add("visible");
+  showScreen("quizScreen");
+  renderQuestion();
+});
+
+/* ================= عرض السؤال ================= */
+function renderQuestion(){
+  const q = state.deck[state.index];
+  const side = currentSide();
+  $("turnChip").textContent = "🎯 الدور على: " + state.names[side];
+  $("qCounter").textContent = "سؤال " + (state.index + 1) + " من " + TOTAL_QUESTIONS +
+    " — (السؤال " + (Math.floor(state.index / 2) + 1) + " من " + QUESTIONS_PER_SIDE + " لهذا الطرف)";
+  $("qCat").textContent = q.category;
+  $("qDiff").textContent = "المستوى: " + q.difficulty;
+  $("qText").textContent = q.question;
+  $("answerText").textContent = q.answer;
+  $("answerBox").classList.remove("visible");
+  $("revealRow").style.display = "flex";
+  $("judgeRow").style.display = "none";
+  $("nextRow").style.display = "none";
+  // إعادة تشغيل تأثير الظهور
+  const qt = $("qText");
+  qt.style.animation = "none";
+  void qt.offsetWidth;
+  qt.style.animation = "";
+  $("progressBar").style.width = (state.index / TOTAL_QUESTIONS * 100) + "%";
+}
+
+$("revealBtn").addEventListener("click", () => {
+  $("answerBox").classList.add("visible");
+  $("revealRow").style.display = "none";
+  $("judgeRow").style.display = "flex";
+});
+
+function judge(correct){
+  if(correct) state.scores[currentSide()]++;
+  updateScoreboard();
+  $("judgeRow").style.display = "none";
+  $("nextRow").style.display = "flex";
+  $("nextBtn").textContent = (state.index + 1 >= TOTAL_QUESTIONS) ? "🏁 النتيجة النهائية" : "⏭️ السؤال التالي";
+  $("progressBar").style.width = ((state.index + 1) / TOTAL_QUESTIONS * 100) + "%";
+}
+$("correctBtn").addEventListener("click", () => judge(true));
+$("wrongBtn").addEventListener("click", () => judge(false));
+
+$("nextBtn").addEventListener("click", () => {
+  state.index++;
+  if(state.index >= TOTAL_QUESTIONS){
+    endMatch();
+  } else {
+    renderQuestion();
+  }
+});
+
+/* ================= النهاية ================= */
+const HYPE_WIN = [
+  "أداء عالمي يستحق كأسًا ذهبية! 🏆",
+  "ذاكرة كروية من طراز المونديال! ⚽",
+  "فوز مستحق… الجماهير تهتف باسمك! 📣",
+  "هذا مستوى نهائيات كأس العالم بلا منازع! 🥇"
+];
+
+function endMatch(){
+  state.finished = true;
+  const [s1, s2] = state.scores;
+  $("finalScore").textContent = state.names[0] + " " + s1 + " — " + s2 + " " + state.names[1];
+  if(s1 === s2){
+    $("endEmoji").textContent = "🤝";
+    $("endTitle").innerHTML = "تعادل مثير! نحتاج إلى <span class='winner-name'>سؤال ذهبي</span> لحسم التحدي.";
+    $("hypeMsg").textContent = "النتيجة متساوية بعد " + TOTAL_QUESTIONS + " سؤالًا… اللقب يُحسم بالسؤال الذهبي! 🌟";
+    $("goldenCallRow").style.display = "flex";
+    $("waBtn").style.display = "none";
+  } else {
+    const winner = s1 > s2 ? state.names[0] : state.names[1];
+    declareWinner(winner);
+  }
+  saveResult();
+  showScreen("endScreen");
+}
+
+function declareWinner(winner){
+  $("endEmoji").textContent = "🏆";
+  $("endTitle").innerHTML = "الفائز: <span class='winner-name'></span>";
+  $("endTitle").querySelector(".winner-name").textContent = winner + " 🥇";
+  $("hypeMsg").textContent = HYPE_WIN[Math.floor(Math.random() * HYPE_WIN.length)];
+  $("goldenCallRow").style.display = "none";
+  $("waBtn").style.display = "inline-flex";
+  launchConfetti();
+}
+
+/* ================= السؤال الذهبي ================= */
+$("goldenBtn").addEventListener("click", showGoldenQuestion);
+
+function showGoldenQuestion(){
+  if(state.goldenPool.length === 0){
+    state.goldenPool = shuffle(QUESTIONS); // احتياط: إعادة تعبئة
+  }
+  const q = state.goldenPool.shift();
+  $("gText").textContent = q.question;
+  $("gAnswerText").textContent = q.answer;
+  $("gAnswerBox").classList.remove("visible");
+  $("gRevealRow").style.display = "flex";
+  $("gJudgeRow").style.display = "none";
+  $("gWinABtn").textContent = "🏅 " + state.names[0] + " أجاب صحيحًا";
+  $("gWinBBtn").textContent = "🏅 " + state.names[1] + " أجاب صحيحًا";
+  showScreen("goldenScreen");
+}
+
+$("gRevealBtn").addEventListener("click", () => {
+  $("gAnswerBox").classList.add("visible");
+  $("gRevealRow").style.display = "none";
+  $("gJudgeRow").style.display = "flex";
+});
+
+function goldenWin(sideIdx){
+  state.scores[sideIdx]++;
+  updateScoreboard();
+  const [s1, s2] = state.scores;
+  $("finalScore").textContent = state.names[0] + " " + s1 + " — " + s2 + " " + state.names[1] + " (بعد السؤال الذهبي 🌟)";
+  declareWinner(state.names[sideIdx]);
+  saveResult();
+  showScreen("endScreen");
+}
+$("gWinABtn").addEventListener("click", () => goldenWin(0));
+$("gWinBBtn").addEventListener("click", () => goldenWin(1));
+$("gNoneBtn").addEventListener("click", showGoldenQuestion);
+
+/* ================= الحفظ والمشاركة وإعادة الضبط ================= */
+function saveResult(){
+  try{
+    const data = {
+      p1: state.names[0], p2: state.names[1],
+      s1: state.scores[0], s2: state.scores[1],
+      type: state.matchType,
+      date: new Date().toLocaleDateString("ar")
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }catch(e){ /* تجاهل إن كان التخزين معطلًا */ }
+}
+
+function showLastResult(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const d = JSON.parse(raw);
+    $("lastResultText").textContent = "📊 آخر نتيجة (" + d.date + "): " + d.p1 + " " + d.s1 + " — " + d.s2 + " " + d.p2;
+    $("lastResult").classList.add("visible");
+  }catch(e){ /* تجاهل */ }
+}
+
+$("clearLastBtn").addEventListener("click", () => {
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  $("lastResult").classList.remove("visible");
+});
+
+$("replayBtn").addEventListener("click", () => {
+  $("scoreboard").classList.remove("visible");
+  showLastResult();
+  showScreen("setupScreen");
+});
+
+$("waBtn").addEventListener("click", () => {
+  const [s1, s2] = state.scores;
+  const winner = s1 > s2 ? state.names[0] : state.names[1];
+  const msg = "🏆 تحدي المونديال ⚽\n" +
+    state.matchType + "\n" +
+    state.names[0] + " " + s1 + " — " + s2 + " " + state.names[1] + "\n" +
+    "الفائز: " + winner + " 🥇\n" +
+    "من يملك الذاكرة الأقوى؟ جرّب التحدي!";
+  window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
+});
+
+/* ================= كونفيتي احتفالي ================= */
+function launchConfetti(){
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#d4a017", "#f0c948", "#1f7a45", "#14532d", "#ffffff"];
+  for(let i = 0; i < 90; i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.width = (6 + Math.random() * 8) + "px";
+    c.style.height = (8 + Math.random() * 10) + "px";
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = (2.4 + Math.random() * 2.4) + "s";
+    c.style.animationDelay = (Math.random() * 0.9) + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 6000);
+  }
+}
+
+/* ================= تهيئة ================= */
+showLastResult();
+</script>
+</body>
+</html>
